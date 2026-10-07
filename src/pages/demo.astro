@@ -32,17 +32,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div id="demo-confirmation" class="confirmation" hidden>
         <p>We'll write back.</p>
       </div>
+
+      <p id="demo-error" class="form-error" hidden>Something went wrong — please try again.</p>
     </div>
   </section>
 
   <script>
-    const form = document.getElementById('demo-form');
-    const confirmation = document.getElementById('demo-confirmation');
+    import { supabase } from '../lib/supabase';
 
-    form?.addEventListener('submit', (event) => {
+    const form = document.getElementById('demo-form') as HTMLFormElement | null;
+    const confirmation = document.getElementById('demo-confirmation');
+    const errorMessage = document.getElementById('demo-error');
+
+    form?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      // No backend wired up yet — this just swaps in the confirmation state.
-      // TODO: wire real submission (e.g. Netlify Forms / Formspree / custom endpoint) before launch.
+      errorMessage?.setAttribute('hidden', '');
+
+      const data = new FormData(form);
+      const { error } = await supabase.from('leads').insert({
+        name: String(data.get('name') ?? ''),
+        company_name: String(data.get('company') ?? ''),
+        work_email: String(data.get('email') ?? ''),
+        number_of_people: Number(data.get('people')),
+      });
+
+      if (error) {
+        console.error('Failed to submit demo request', error);
+        errorMessage?.removeAttribute('hidden');
+        return;
+      }
+
       form.hidden = true;
       confirmation?.removeAttribute('hidden');
     });
@@ -122,5 +141,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .confirmation p {
     font-family: var(--font-heading);
     font-size: 1.25rem;
+  }
+
+  .form-error {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #a33b2a;
   }
 </style>
