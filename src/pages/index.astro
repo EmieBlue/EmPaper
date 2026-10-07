@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+import StaffCardMockup from '../components/StaffCardMockup.astro';
+---
+
+<BaseLayout
+  title="Home"
+  description="Their papers. Without the chase. Payslips ready to download, employment letters on request, details kept in one page."
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">For companies</p>
+        <h1>Their papers. Without the chase.</h1>
+        <p class="lede muted">
+          Payslips ready to download. Employment letters on request. Details kept in one page.
+          HR stops resending the same file.
+        </p>
+        <div class="actions">
+          <Button href="/demo" variant="filled">Book a demo</Button>
+          <Button href="mailto:hello@empaper.com" variant="outlined">Talk to us</Button>
+        </div>
+        <p class="fine-print muted">Set up once. Your name on the page. Powered by Empaper.</p>
+      </div>
+
+      <div class="hero-visual">
+        <StaffCardMockup />
+      </div>
+    </div>
+  </section>
+
+  <!--
+    Card bodies below are drafted copy, not present in the design deck (slide 5 gives
+    only the three titles). Flag for sign-off before launch.
+  -->
+  <section class="cards-section">
+    <div class="container cards-grid">
+      <FeatureCard
+        title="Payslips, ready."
+        body="Every month, downloadable the moment it's issued."
+      />
+      <FeatureCard
+        title="Letters, on request."
+        body="Introductory or employment — requested in a click, ready to pick up."
+      />
+      <FeatureCard
+        title="Details, kept current."
+        body="Role, bank, and address — updated by them, visible to HR."
+      />
+    </div>
+  </section>
+
+  <section class="start-section">
+    <div class="container">
+      <h2 class="section-title">Book a demo. Add your people. They open their page.</h2>
+      <div class="steps-grid">
+        <FeatureCard number="1" title="Book a demo" />
+        <FeatureCard number="2" title="Add your people" />
+        <FeatureCard number="3" title="They open their page" />
+      </div>
+    </div>
+  </section>
+
+  <section class="close-section">
+    <div class="container close-grid">
+      <h2>Their papers. Without the chase.</h2>
+      <Button href="/demo" variant="filled">Book a demo</Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+
+  .hero-grid > * {
+    min-width: 0;
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    margin-block: 0.75rem 1.25rem;
+  }
+
+  .lede {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    max-width: 34rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.75rem;
+    flex-wrap: wrap;
+  }
+
+  .fine-print {
+    margin-top: 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cards-section {
+    background: var(--color-card);
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    max-width: 40rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .close-section {
+    background: var(--color-ink);
+  }
+
+  .close-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .close-grid h2 {
+    color: var(--color-paper);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    max-width: 30rem;
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-visual {
+      order: -1;
+    }
+
+    .cards-grid,
+    .steps-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

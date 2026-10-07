@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout
+  title="For companies"
+  description="HR stops resending payslips and letters. Owners get one staff page, not a shared folder."
+>
+  <section>
+    <div class="container">
+      <p class="eyebrow">For companies</p>
+      <h1>HR stops resending payslips and letters.</h1>
+
+      <ul class="points">
+        <li>Owners get one staff page, not a shared folder.</li>
+        <li>Their name in front. Empaper only at the bottom.</li>
+      </ul>
+
+      <Button href="/demo" variant="filled">Book a demo</Button>
+    </div>
+  </section>
+
+  <!--
+    Trust line below is new copy from the differentiation discussion (not in the
+    design deck). It's a factual claim about data access — confirm it's accurate
+    for the real product before shipping this wording.
+  -->
+  <section class="trust-section">
+    <div class="container">
+      <hr class="divider" />
+      <p class="trust-line muted">
+        Bank details, addresses, and payslips are visible only to the employee and their HR —
+        nothing is shared beyond that page.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    max-width: 34rem;
+    margin-top: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .points {
+    list-style: none;
+    margin: 0 0 2.5rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: 32rem;
+  }
+
+  .points li {
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .points li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-gold);
+  }
+
+  .trust-section {
+    padding-top: 0;
+  }
+
+  .trust-section .divider {
+    margin-bottom: 2rem;
+  }
+
+  .trust-line {
+    max-width: 36rem;
+    font-size: 0.9375rem;
+  }
+</style>

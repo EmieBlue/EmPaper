@@ -1,0 +1,101 @@
+---
+import Button from './Button.astro';
+import { navLinks } from './nav-links';
+
+const headerLinks = navLinks.filter((link) => link.label !== 'Demo');
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container bar">
+    <a href="/" class="logo">
+      Empaper<span class="logo-dot" aria-hidden="true"></span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      {
+        headerLinks.map((link) => (
+          <a href={link.href} aria-current={currentPath === link.href ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <Button href="/demo" variant="filled">Book a demo</Button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-gold) 40%, transparent);
+    background: var(--color-paper);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.25rem;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-ink);
+    flex-shrink: 0;
+  }
+
+  .logo-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    margin-left: 0.4rem;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav a {
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    padding-block: 0.25rem;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav a:hover {
+    color: var(--color-seal);
+  }
+
+  .nav a[aria-current='page'] {
+    border-bottom-color: var(--color-seal);
+  }
+
+  @media (max-width: 768px) {
+    .bar {
+      flex-wrap: wrap;
+      row-gap: 0.75rem;
+    }
+
+    .nav {
+      order: 3;
+      width: 100%;
+      justify-content: flex-start;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+  }
+</style>

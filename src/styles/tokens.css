@@ -1,0 +1,18 @@
+:root {
+  /* Brand colors — hex values from the EmPaper design deck, slide 2 */
+  --color-ink: #1c2333; /* text, sidebar, logo */
+  --color-paper: #f4f1ea; /* page background */
+  --color-card: #fffcf8; /* payslip / letter cards */
+  --color-seal: #1f6b5a; /* Book a demo button, active item */
+  --color-seal-dark: #17584a; /* seal hover/active shade */
+  --color-gold: #c4a46a; /* dividers, logo accent */
+  --color-muted: #6e675f; /* hints, labels */
+
+  --font-heading: 'Newsreader', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --container-width: 72rem;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}

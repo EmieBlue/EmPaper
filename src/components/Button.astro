@@ -1,0 +1,68 @@
+---
+interface Props {
+  variant?: 'filled' | 'outlined';
+  href?: string;
+  type?: 'button' | 'submit';
+  class?: string;
+}
+
+const { variant = 'filled', href, type, class: className = '' } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class:list={['btn', variant === 'filled' ? 'btn-filled' : 'btn-outlined', className]}
+  href={href}
+  type={!href ? (type ?? 'button') : undefined}
+>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      transform 0.1s ease;
+    line-height: 1;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-filled {
+    background: var(--color-seal);
+    border-color: var(--color-seal);
+    color: var(--color-card);
+  }
+
+  .btn-filled:hover {
+    background: var(--color-seal-dark);
+    border-color: var(--color-seal-dark);
+  }
+
+  .btn-outlined {
+    background: transparent;
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .btn-outlined:hover {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+</style>

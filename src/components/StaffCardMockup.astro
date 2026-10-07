@@ -1,0 +1,141 @@
+---
+---
+
+<div class="staff-card" role="img" aria-label="Preview of an employee's Empaper page, showing a payslip ready to download, an employment letter marked as requested, and their saved details">
+  <p class="company muted-on-dark">Riverstone Logistics Ltd.</p>
+  <h3 class="name">Amara Chukwu</h3>
+
+  <div class="row">
+    <div class="row-text">
+      <p class="label">September payslip</p>
+      <p class="hint">Ready</p>
+    </div>
+    <span class="chip chip-action">Download</span>
+  </div>
+
+  <div class="row">
+    <div class="row-text">
+      <p class="label">Employment letter</p>
+      <p class="hint">Requested</p>
+    </div>
+    <span class="chip chip-pending">Requested</span>
+  </div>
+
+  <hr class="gold-divider" />
+
+  <dl class="details">
+    <div>
+      <dt>Role</dt>
+      <dd>Fleet Coordinator</dd>
+    </div>
+    <div>
+      <dt>Bank</dt>
+      <dd>•••• 4821</dd>
+    </div>
+    <div>
+      <dt>Address</dt>
+      <dd>On file</dd>
+    </div>
+  </dl>
+</div>
+
+<style>
+  .staff-card {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 24rem;
+    min-width: 0;
+  }
+
+  .muted-on-dark {
+    color: color-mix(in srgb, var(--color-paper) 65%, transparent);
+    font-size: 0.8125rem;
+  }
+
+  .name {
+    font-size: 1.35rem;
+    color: var(--color-paper);
+  }
+
+  .row {
+    background: var(--color-card);
+    color: var(--color-ink);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .row-text {
+    min-width: 0;
+  }
+
+  .label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .hint {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .chip {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .chip-action {
+    background: var(--color-seal);
+    color: var(--color-card);
+  }
+
+  .chip-pending {
+    background: transparent;
+    color: var(--color-muted);
+    border: 1px solid var(--color-muted);
+  }
+
+  .gold-divider {
+    border: none;
+    border-top: 1px solid var(--color-gold);
+    opacity: 0.5;
+    margin: 0.25rem 0;
+  }
+
+  .details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .details > div {
+    min-width: 0;
+  }
+
+  .details dt {
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--color-paper) 55%, transparent);
+    margin-bottom: 0.2rem;
+  }
+
+  .details dd {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-paper);
+  }
+</style>

@@ -1,0 +1,44 @@
+---
+interface Props {
+  number?: string;
+  title: string;
+  body?: string;
+}
+
+const { number, title, body } = Astro.props;
+---
+
+<div class="card">
+  {number && <span class="number muted">{number}</span>}
+  <h3>{title}</h3>
+  {body && <p class="muted">{body}</p>}
+  <slot />
+</div>
+
+<style>
+  .card {
+    background: var(--color-card);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    height: 100%;
+  }
+
+  .number {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+
+  p {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+</style>

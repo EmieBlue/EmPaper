@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+---
+
+<BaseLayout
+  title="Product"
+  description="What staff open. One screen each: payslip, letter, and details."
+>
+  <section>
+    <div class="container">
+      <p class="eyebrow">Product</p>
+      <h1>What staff open. One screen each.</h1>
+
+      <div class="grid">
+        <FeatureCard
+          number="01"
+          title="Payslip"
+          body="A list of months. Download sits on the latest. Nothing else on that screen."
+        />
+        <FeatureCard
+          number="02"
+          title="Letter"
+          body="Two choices: introductory or employment. Status moves from requested to ready."
+        />
+        <FeatureCard
+          number="03"
+          title="Details"
+          body="Role, bank, address, phone. The employee edits. HR sees the same page."
+        />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    max-width: 36rem;
+    margin-top: 0.75rem;
+    margin-bottom: 3rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

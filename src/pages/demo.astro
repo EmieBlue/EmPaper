@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Demo" description="Book a demo of Empaper for your company.">
+  <section>
+    <div class="container narrow">
+      <p class="eyebrow">Demo</p>
+      <h1>Book a demo</h1>
+
+      <form id="demo-form" class="demo-form">
+        <label>
+          Name
+          <input type="text" name="name" required />
+        </label>
+        <label>
+          Company
+          <input type="text" name="company" required />
+        </label>
+        <label>
+          Work email
+          <input type="email" name="email" required />
+        </label>
+        <label>
+          Number of people
+          <input type="number" name="people" min="1" required />
+        </label>
+
+        <button type="submit" class="btn btn-filled">Book a demo</button>
+      </form>
+
+      <div id="demo-confirmation" class="confirmation" hidden>
+        <p>We'll write back.</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('demo-form');
+    const confirmation = document.getElementById('demo-confirmation');
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      // No backend wired up yet — this just swaps in the confirmation state.
+      // TODO: wire real submission (e.g. Netlify Forms / Formspree / custom endpoint) before launch.
+      form.hidden = true;
+      confirmation?.removeAttribute('hidden');
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .narrow {
+    max-width: 30rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    margin-top: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .demo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .demo-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .demo-form input {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid color-mix(in srgb, var(--color-gold) 50%, transparent);
+    background: var(--color-card);
+    color: var(--color-ink);
+  }
+
+  .demo-form input:focus {
+    outline: none;
+    border-color: var(--color-seal);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.4rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border: 1.5px solid var(--color-seal);
+    background: var(--color-seal);
+    color: var(--color-card);
+    cursor: pointer;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+  }
+
+  .btn:hover {
+    background: var(--color-seal-dark);
+    border-color: var(--color-seal-dark);
+  }
+
+  .confirmation {
+    background: var(--color-card);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+  }
+
+  .confirmation p {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+  }
+</style>
