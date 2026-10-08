@@ -26,6 +26,39 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <input type="number" name="people" min="1" required />
         </label>
 
+        <fieldset class="interests">
+          <legend>What are you most interested in? (optional)</legend>
+          <label class="checkbox-row">
+            <input type="checkbox" name="interests" value="pay_letters" />
+            Pay &amp; Letters
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="interests" value="time_off_holidays" />
+            Time Off &amp; Holidays
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="interests" value="people_directory" />
+            People Directory
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="interests" value="my_info" />
+            My Info
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="interests" value="company_files_announcements" />
+            Company Files &amp; Announcements
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="interests" value="inbox_instant_answers" />
+            Inbox &amp; Instant Answers
+          </label>
+        </fieldset>
+
+        <label>
+          Anything else we should know? (optional)
+          <textarea name="notes" rows="3"></textarea>
+        </label>
+
         <button type="submit" class="btn btn-filled">Book a demo</button>
       </form>
 
@@ -54,6 +87,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         company_name: String(data.get('company') ?? ''),
         work_email: String(data.get('email') ?? ''),
         number_of_people: Number(data.get('people')),
+        interested_features: data.getAll('interests').map(String),
+        notes: String(data.get('notes') ?? ''),
       });
 
       if (error) {
@@ -105,9 +140,54 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: var(--color-text);
   }
 
-  .demo-form input:focus {
+  .demo-form input:focus,
+  .demo-form textarea:focus {
     outline: none;
     border-color: var(--color-accent);
+  }
+
+  .demo-form textarea {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--color-border);
+    background: var(--color-card);
+    color: var(--color-text);
+    resize: vertical;
+  }
+
+  .interests {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .interests legend {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    padding: 0;
+    margin-bottom: 0.2rem;
+  }
+
+  .demo-form label.checkbox-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: var(--color-text);
+  }
+
+  .checkbox-row input {
+    accent-color: var(--color-accent);
+    width: 1rem;
+    height: 1rem;
   }
 
   .btn {
