@@ -59,6 +59,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <textarea name="notes" rows="3"></textarea>
         </label>
 
+        <div class="hp" aria-hidden="true">
+          <label>
+            Website
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
         <button type="submit" class="btn btn-filled">Book a demo</button>
       </form>
 
@@ -66,22 +73,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p>We'll write back.</p>
       </div>
 
-      <p id="demo-error" class="form-error" hidden>Something went wrong — please try again.</p>
+      <p id="demo-error" class="form-error" aria-live="polite" hidden>Something went wrong — please try again.</p>
     </div>
   </section>
 
   <script>
-    import { supabase } from '../lib/supabase';
-
     const form = document.getElementById('demo-form') as HTMLFormElement | null;
     const confirmation = document.getElementById('demo-confirmation');
     const errorMessage = document.getElementById('demo-error');
+    const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
 
-    form?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      errorMessage?.setAttribute('hidden', '');
+    const GENERIC_ERROR = 'Something went wrong — please try again.';
+    // Reused across retries so the owner never gets two emails for one submission.
+    const submissionId = crypto.randomUUID();
 
-      const data = new FormData(form);
+    function showError(message: string) {
+      if (!errorMessage) return;
+      errorMessage.textContent = message;
+      errorMessage.removeAttribute('hidden');
+    }
+
+    // Used only when /api/lead isn't deployed (e.g. `astro dev`): the lead is still saved, just without the email alert.
+    async function saveDirectly(data: FormData): Promise<boolean> {
+      const { supabase } = await import('../lib/supabase');
       const { error } = await supabase.from('leads').insert({
         name: String(data.get('name') ?? ''),
         company_name: String(data.get('company') ?? ''),
@@ -90,15 +104,62 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         interested_features: data.getAll('interests').map(String),
         notes: String(data.get('notes') ?? ''),
       });
-
       if (error) {
         console.error('Failed to submit demo request', error);
-        errorMessage?.removeAttribute('hidden');
-        return;
+        return false;
+      }
+      return true;
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorMessage?.setAttribute('hidden', '');
+      if (submitButton) submitButton.disabled = true;
+
+      const data = new FormData(form);
+      let saved = false;
+
+      try {
+        const response = await fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: data.get('name'),
+            company: data.get('company'),
+            email: data.get('email'),
+            people: data.get('people'),
+            interests: data.getAll('interests'),
+            notes: data.get('notes'),
+            website: data.get('website'),
+            submissionId,
+          }),
+          signal: AbortSignal.timeout(15000),
+        });
+        const isJson = (response.headers.get('content-type') ?? '').includes('application/json');
+
+        if (response.ok) {
+          saved = true;
+        } else if (response.status === 404 && !isJson) {
+          // The function never ran, so a direct insert can't create a duplicate.
+          saved = await saveDirectly(data);
+          if (!saved) showError(GENERIC_ERROR);
+        } else if (response.status === 400 && isJson) {
+          const result = await response.json().catch(() => null);
+          showError(typeof result?.message === 'string' ? result.message : GENERIC_ERROR);
+        } else {
+          showError(GENERIC_ERROR);
+        }
+      } catch (error) {
+        console.error('Failed to submit demo request', error);
+        showError(GENERIC_ERROR);
       }
 
-      form.hidden = true;
-      confirmation?.removeAttribute('hidden');
+      if (saved) {
+        form.hidden = true;
+        confirmation?.removeAttribute('hidden');
+      } else if (submitButton) {
+        submitButton.disabled = false;
+      }
     });
   </script>
 </BaseLayout>
@@ -118,6 +179,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+  }
+
+  .demo-form[hidden] {
+    display: none;
   }
 
   .demo-form label {
@@ -188,6 +253,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     accent-color: var(--color-accent);
     width: 1rem;
     height: 1rem;
+  }
+
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
   }
 
   .btn {
