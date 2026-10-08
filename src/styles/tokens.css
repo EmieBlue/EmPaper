@@ -1,17 +1,17 @@
 :root {
-  /* Brand colors — EmPaper 2026 rebrand palette */
-  --color-primary: #1e293b; /* dark-panel backgrounds only — mockup cards, closing CTA sections */
-  --color-accent: #2563eb; /* primary action color — filled buttons, active nav/links, stat emphasis */
+  /* Brand colors — EmPaper 2026 rebrand palette, v2 (navy/teal/blue) */
+  --color-primary: #12304a; /* dark-panel backgrounds only — mockup cards, closing CTA sections */
+  --color-accent: #3b82f6; /* primary action color — filled buttons, active nav/links, stat emphasis */
   --color-accent-hover: color-mix(in srgb, var(--color-accent) 85%, black); /* derived hover shade — no hex was supplied for this, so it's computed rather than invented */
-  --color-accent-secondary: #475569; /* outlined-button border/text and its hover fill */
+  --color-accent-secondary: #159a9c; /* secondary/teal — outlined-button border/text and its hover fill */
   --color-highlight: #d4a72c; /* decorative accent only — logo dot, bullet markers; never structural borders */
-  --color-background: #f8fafc; /* page / section background */
+  --color-background: #f5f7fa; /* page / section background */
   --color-card: #ffffff; /* card backgrounds, and foreground text placed on dark or filled surfaces */
-  --color-text: #0f172a; /* default body copy and heading color on light backgrounds */
+  --color-text: #172b3a; /* default body copy and heading color on light backgrounds */
   --color-text-secondary: #64748b; /* hints, labels, secondary/muted text */
-  --color-success: #059669; /* "ready / done" status */
-  --color-warning: #d97706; /* "pending / in progress" status */
-  --color-error: #dc2626; /* form / validation error text */
+  --color-success: #22a06b; /* "ready / done" status */
+  --color-warning: #f59e0b; /* "pending / in progress" status */
+  --color-error: #dc4c4c; /* form / validation error text */
   --color-border: #e2e8f0; /* structural hairline borders — cards, dividers, inputs */
 
   --font-heading: 'Newsreader', Georgia, serif;
