@@ -1,0 +1,139 @@
+---
+---
+
+<div class="dashboard-card" role="img" aria-label="Preview of an employee's home page, showing annual and sick leave balances, two upcoming holidays, and how many people are out today">
+  <p class="company muted-on-dark">Sankofa Textiles Ltd.</p>
+  <h3 class="name">Kwame Mensah</h3>
+
+  <div class="row">
+    <div class="row-text">
+      <p class="label">Annual leave</p>
+      <p class="hint">7 days scheduled</p>
+    </div>
+    <span class="stat">18d</span>
+  </div>
+
+  <div class="row">
+    <div class="row-text">
+      <p class="label">Sick leave</p>
+      <p class="hint">Available this year</p>
+    </div>
+    <span class="stat">10d</span>
+  </div>
+
+  <hr class="gold-divider" />
+
+  <p class="section-label muted-on-dark">Upcoming holidays</p>
+  <ul class="holiday-list">
+    <li>
+      <span class="holiday-name">Independence Day</span>
+      <span class="holiday-date muted-on-dark">6 Mar</span>
+    </li>
+    <li>
+      <span class="holiday-name">Farmers' Day</span>
+      <span class="holiday-date muted-on-dark">First Fri, Dec</span>
+    </li>
+  </ul>
+
+  <p class="out-today muted-on-dark">Out today — 2 people</p>
+</div>
+
+<style>
+  .dashboard-card {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 24rem;
+    min-width: 0;
+  }
+
+  .muted-on-dark {
+    color: color-mix(in srgb, var(--color-paper) 65%, transparent);
+    font-size: 0.8125rem;
+  }
+
+  .name {
+    font-size: 1.35rem;
+    color: var(--color-paper);
+  }
+
+  .row {
+    background: var(--color-card);
+    color: var(--color-ink);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .row-text {
+    min-width: 0;
+  }
+
+  .label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .hint {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .stat {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    color: var(--color-seal);
+    white-space: nowrap;
+  }
+
+  .gold-divider {
+    border: none;
+    border-top: 1px solid var(--color-gold);
+    opacity: 0.5;
+    margin: 0.25rem 0;
+  }
+
+  .section-label {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .holiday-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .holiday-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .holiday-name {
+    font-size: 0.9375rem;
+    color: var(--color-paper);
+  }
+
+  .holiday-date {
+    white-space: nowrap;
+  }
+
+  .out-today {
+    margin: 0;
+  }
+</style>

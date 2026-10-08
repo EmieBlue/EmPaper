@@ -5,16 +5,19 @@ import Button from '../components/Button.astro';
 
 <BaseLayout
   title="For companies"
-  description="HR stops resending payslips and letters. Owners get one staff page, not a shared folder."
+  description="HR stops repeating itself. Owners get one staff page, not a shared folder and a spreadsheet."
 >
   <section>
     <div class="container">
       <p class="eyebrow">For companies</p>
-      <h1>HR stops resending payslips and letters.</h1>
+      <h1>HR stops repeating itself.</h1>
 
       <ul class="points">
         <li>Owners get one staff page, not a shared folder.</li>
         <li>Their name in front. Empaper only at the bottom.</li>
+        <li>One directory — no more asking who the new hire's manager is.</li>
+        <li>Post once. Everyone with access sees it, no resending to a list.</li>
+        <li>Leave requests and balances in one place, not a spreadsheet or a WhatsApp thread.</li>
       </ul>
 
       <Button href="/demo" variant="filled">Book a demo</Button>
@@ -24,14 +27,19 @@ import Button from '../components/Button.astro';
   <!--
     Trust line below is new copy from the differentiation discussion (not in the
     design deck). It's a factual claim about data access — confirm it's accurate
-    for the real product before shipping this wording.
+    for the real product before shipping this wording. The second sentence is new
+    as of the features expansion: confirm the "visible company-wide by design"
+    claim for directory/files/announcements specifically before shipping, since
+    it describes the intended model rather than something already built and
+    verified against real access-control rules.
   -->
   <section class="trust-section">
     <div class="container">
       <hr class="divider" />
       <p class="trust-line muted">
-        Bank details, addresses, and payslips are visible only to the employee and their HR —
-        nothing is shared beyond that page.
+        Bank details, addresses, personal contact, and payslips are visible only to the
+        employee and their HR — nothing is shared beyond that page. Directory entries,
+        company files, and announcements are visible company-wide, by design.
       </p>
     </div>
   </section>

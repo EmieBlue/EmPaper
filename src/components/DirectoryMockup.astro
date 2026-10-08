@@ -1,0 +1,110 @@
+---
+---
+
+<div class="directory-card" role="img" aria-label="Preview of the company directory, showing employees grouped alphabetically by last name with their job titles">
+  <div class="directory-header">
+    <p class="eyebrow-small">All employees</p>
+    <span class="count muted">(34)</span>
+  </div>
+
+  <div class="group">
+    <p class="letter muted">A</p>
+    <div class="person-row">
+      <span class="person-name">Linda Appiah</span>
+      <span class="person-title muted">Accounts Officer</span>
+    </div>
+    <div class="person-row">
+      <span class="person-name">Kwesi Asante</span>
+      <span class="person-title muted">Warehouse Supervisor</span>
+    </div>
+  </div>
+
+  <div class="group">
+    <p class="letter muted">K</p>
+    <div class="person-row">
+      <span class="person-name">Grace Kusi</span>
+      <span class="person-title muted">Customer Support Lead</span>
+    </div>
+    <div class="person-row">
+      <span class="person-name">Daniel Koomson</span>
+      <span class="person-title muted">IT Support Officer</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .directory-card {
+    background: var(--color-card);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 24rem;
+    min-width: 0;
+  }
+
+  .directory-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .eyebrow-small {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-seal);
+    margin: 0;
+  }
+
+  .count {
+    font-size: 0.8125rem;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .letter {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .person-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
+    min-width: 0;
+  }
+
+  .group .person-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .person-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .person-title {
+    font-size: 0.8125rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+</style>

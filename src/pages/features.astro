@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+import HomeDashboardMockup from '../components/HomeDashboardMockup.astro';
+import DirectoryMockup from '../components/DirectoryMockup.astro';
+---
+
+<BaseLayout
+  title="Features"
+  description="Pay, leave, directory, files, and the inbox — everything staff need, still one page each."
+>
+  <section>
+    <div class="container">
+      <p class="eyebrow">Features</p>
+      <h1>Everything staff need. One page, not six apps.</h1>
+      <p class="intro muted">
+        The page every employee opens. Six parts, built in — not six places to check.
+      </p>
+
+      <div class="grid">
+        <FeatureCard
+          number="01"
+          title="Pay & Letters"
+          body="A list of months. Download sits on the latest. Letters — introductory or employment — move from requested to ready."
+        />
+        <FeatureCard
+          number="02"
+          title="Time Off & Holidays"
+          body="Leave balances, a request in a tap. The company's holiday list, already on the page."
+        />
+        <FeatureCard
+          number="03"
+          title="People Directory"
+          body="Every employee, searchable by name. Role and contact, one line each."
+        />
+        <FeatureCard
+          number="04"
+          title="My Info"
+          body="Role, bank, address, phone. The employee edits. HR sees the same page."
+        />
+        <FeatureCard
+          number="05"
+          title="Company Files & Announcements"
+          body="Handbooks, forms, and policies in one shared folder. Company news, posted once, seen by everyone."
+        />
+        <FeatureCard
+          number="06"
+          title="Inbox & Instant Answers"
+          body="Ask a question, request a letter, request time off. It lands in HR's inbox, not a group chat."
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="preview-section">
+    <div class="container preview-grid">
+      <div class="preview-copy">
+        <h2>Leave, holidays, who's out — one glance.</h2>
+        <p class="muted">
+          Balances update as they're used. Upcoming holidays are already on the page.
+          No spreadsheet, no forwarded email.
+        </p>
+      </div>
+      <div class="preview-visual">
+        <HomeDashboardMockup />
+      </div>
+    </div>
+  </section>
+
+  <section class="preview-section alt">
+    <div class="container preview-grid reverse">
+      <div class="preview-visual">
+        <DirectoryMockup />
+      </div>
+      <div class="preview-copy">
+        <h2>Find anyone, in a search.</h2>
+        <p class="muted">
+          Name, role, how to reach them. No separate address book for HR to keep updated.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="close-section">
+    <div class="container close-grid">
+      <h2>One page. Everything on it.</h2>
+      <Button href="/demo" variant="filled">Book a demo</Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    max-width: 38rem;
+    margin-top: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .intro {
+    max-width: 32rem;
+    font-size: 1.0625rem;
+    margin-bottom: 3rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .preview-section {
+    background: var(--color-card);
+  }
+
+  .preview-section.alt {
+    background: var(--color-paper);
+  }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+
+  .preview-grid.reverse {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .preview-grid > * {
+    min-width: 0;
+  }
+
+  .preview-copy h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: 0.75rem;
+    max-width: 24rem;
+  }
+
+  .preview-copy p {
+    max-width: 26rem;
+    line-height: 1.6;
+  }
+
+  .preview-visual {
+    display: flex;
+    justify-content: center;
+  }
+
+  .close-section {
+    background: var(--color-ink);
+  }
+
+  .close-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .close-grid h2 {
+    color: var(--color-paper);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    max-width: 30rem;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .preview-grid,
+    .preview-grid.reverse {
+      grid-template-columns: 1fr;
+    }
+
+    .preview-grid.reverse .preview-visual {
+      order: -1;
+    }
+  }
+</style>

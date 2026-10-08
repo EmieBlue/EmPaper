@@ -7,7 +7,7 @@ import StaffCardMockup from '../components/StaffCardMockup.astro';
 
 <BaseLayout
   title="Home"
-  description="Their papers. Without the chase. Payslips ready to download, employment letters on request, details kept in one page."
+  description="Their papers. Without the chase. Payslips, letters, leave, the directory, and the shared files — all on one page."
 >
   <section class="hero">
     <div class="container hero-grid">
@@ -15,8 +15,8 @@ import StaffCardMockup from '../components/StaffCardMockup.astro';
         <p class="eyebrow">For companies</p>
         <h1>Their papers. Without the chase.</h1>
         <p class="lede muted">
-          Payslips ready to download. Employment letters on request. Details kept in one page.
-          HR stops resending the same file.
+          Payslips ready to download. Employment letters on request. Leave, the directory,
+          and the shared files — all on the same page. HR stops resending the same file.
         </p>
         <div class="actions">
           <Button href="/demo" variant="filled">Book a demo</Button>
@@ -33,7 +33,8 @@ import StaffCardMockup from '../components/StaffCardMockup.astro';
 
   <!--
     Card bodies below are drafted copy, not present in the design deck (slide 5 gives
-    only the three titles). Flag for sign-off before launch.
+    only the three original titles: Payslips, Letters, Details). The Leave and
+    Directory cards are net-new beyond the deck. Flag all five for sign-off before launch.
   -->
   <section class="cards-section">
     <div class="container cards-grid">
@@ -49,6 +50,18 @@ import StaffCardMockup from '../components/StaffCardMockup.astro';
         title="Details, kept current."
         body="Role, bank, and address — updated by them, visible to HR."
       />
+      <FeatureCard
+        title="Leave, requested in a tap."
+        body="Balances and holidays on the same page. No spreadsheet to update."
+      />
+      <FeatureCard
+        title="Everyone, in a search."
+        body="Name, role, how to reach them — the whole company, one list."
+      />
+    </div>
+    <div class="more-link">
+      <p class="muted">Five parts here. Six on the full page.</p>
+      <Button href="/features" variant="outlined">See everything it covers</Button>
     </div>
   </section>
 
@@ -119,6 +132,15 @@ import StaffCardMockup from '../components/StaffCardMockup.astro';
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
+  }
+
+  .more-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    margin-top: 2.5rem;
   }
 
   .section-title {
