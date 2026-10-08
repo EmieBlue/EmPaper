@@ -6,7 +6,7 @@ import { navLinks } from './nav-links';
   <div class="container">
     <hr class="divider" />
     <div class="row">
-      <p class="tagline">Their papers. Without the chase.</p>
+      <p class="tagline">Your Digital Workplace, All in One.</p>
 
       <nav class="footer-nav" aria-label="Footer">
         {navLinks.map((link) => <a href={link.href}>{link.label}</a>)}
@@ -37,7 +37,7 @@ import { navLinks } from './nav-links';
   .tagline {
     font-family: var(--font-heading);
     font-size: 1rem;
-    color: var(--color-ink);
+    color: var(--color-text);
   }
 
   .footer-nav {
@@ -49,11 +49,11 @@ import { navLinks } from './nav-links';
   .footer-nav a {
     font-size: 0.875rem;
     text-decoration: none;
-    color: var(--color-muted);
+    color: var(--color-text-secondary);
   }
 
   .footer-nav a:hover {
-    color: var(--color-seal);
+    color: var(--color-accent);
   }
 
   .powered {

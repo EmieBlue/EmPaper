@@ -12,8 +12,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--color-background);
+  color: var(--color-text);
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
@@ -24,7 +24,7 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
-  color: var(--color-ink);
+  color: var(--color-text);
   line-height: 1.15;
   margin: 0;
   font-weight: 500;
@@ -57,18 +57,17 @@ svg {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-seal);
+  color: var(--color-accent);
   margin-bottom: 0.75rem;
 }
 
 .muted {
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
 }
 
 .divider {
   border: none;
-  border-top: 1px solid var(--color-gold);
-  opacity: 0.4;
+  border-top: 1px solid var(--color-border);
   margin: 0;
 }
 

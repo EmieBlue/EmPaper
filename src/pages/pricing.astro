@@ -37,7 +37,7 @@ import Button from '../components/Button.astro';
 
   .price-card {
     background: var(--color-card);
-    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     padding: clamp(2rem, 4vw, 3rem);
     max-width: 28rem;
@@ -55,7 +55,7 @@ import Button from '../components/Button.astro';
   .amount {
     font-family: var(--font-heading);
     font-size: 3rem;
-    color: var(--color-muted);
+    color: var(--color-text-secondary);
   }
 
   .period {
@@ -86,6 +86,6 @@ import Button from '../components/Button.astro';
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: var(--color-gold);
+    background: var(--color-highlight);
   }
 </style>

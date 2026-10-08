@@ -1,12 +1,18 @@
 :root {
-  /* Brand colors — hex values from the EmPaper design deck, slide 2 */
-  --color-ink: #1c2333; /* text, sidebar, logo */
-  --color-paper: #f4f1ea; /* page background */
-  --color-card: #fffcf8; /* payslip / letter cards */
-  --color-seal: #1f6b5a; /* Book a demo button, active item */
-  --color-seal-dark: #17584a; /* seal hover/active shade */
-  --color-gold: #c4a46a; /* dividers, logo accent */
-  --color-muted: #6e675f; /* hints, labels */
+  /* Brand colors — EmPaper 2026 rebrand palette */
+  --color-primary: #1e293b; /* dark-panel backgrounds only — mockup cards, closing CTA sections */
+  --color-accent: #2563eb; /* primary action color — filled buttons, active nav/links, stat emphasis */
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 85%, black); /* derived hover shade — no hex was supplied for this, so it's computed rather than invented */
+  --color-accent-secondary: #475569; /* outlined-button border/text and its hover fill */
+  --color-highlight: #d4a72c; /* decorative accent only — logo dot, bullet markers; never structural borders */
+  --color-background: #f8fafc; /* page / section background */
+  --color-card: #ffffff; /* card backgrounds, and foreground text placed on dark or filled surfaces */
+  --color-text: #0f172a; /* default body copy and heading color on light backgrounds */
+  --color-text-secondary: #64748b; /* hints, labels, secondary/muted text */
+  --color-success: #059669; /* "ready / done" status */
+  --color-warning: #d97706; /* "pending / in progress" status */
+  --color-error: #dc2626; /* form / validation error text */
+  --color-border: #e2e8f0; /* structural hairline borders — cards, dividers, inputs */
 
   --font-heading: 'Newsreader', Georgia, serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

@@ -91,7 +91,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     gap: 0.4rem;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--color-ink);
+    color: var(--color-text);
   }
 
   .demo-form input {
@@ -100,14 +100,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-weight: 400;
     padding: 0.7rem 0.85rem;
     border-radius: var(--radius-sm);
-    border: 1.5px solid color-mix(in srgb, var(--color-gold) 50%, transparent);
+    border: 1.5px solid var(--color-border);
     background: var(--color-card);
-    color: var(--color-ink);
+    color: var(--color-text);
   }
 
   .demo-form input:focus {
     outline: none;
-    border-color: var(--color-seal);
+    border-color: var(--color-accent);
   }
 
   .btn {
@@ -118,8 +118,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border-radius: var(--radius-sm);
     font-size: 0.9375rem;
     font-weight: 600;
-    border: 1.5px solid var(--color-seal);
-    background: var(--color-seal);
+    border: 1.5px solid var(--color-accent);
+    background: var(--color-accent);
     color: var(--color-card);
     cursor: pointer;
     margin-top: 0.5rem;
@@ -127,13 +127,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .btn:hover {
-    background: var(--color-seal-dark);
-    border-color: var(--color-seal-dark);
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
   }
 
   .confirmation {
     background: var(--color-card);
-    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     padding: 2rem;
   }
@@ -146,6 +146,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .form-error {
     margin-top: 1rem;
     font-size: 0.875rem;
-    color: #a33b2a;
+    color: var(--color-error);
   }
 </style>

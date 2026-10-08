@@ -40,8 +40,8 @@
 
 <style>
   .dashboard-card {
-    background: var(--color-ink);
-    color: var(--color-paper);
+    background: var(--color-primary);
+    color: var(--color-card);
     border-radius: var(--radius-lg);
     padding: 1.75rem;
     display: flex;
@@ -53,18 +53,18 @@
   }
 
   .muted-on-dark {
-    color: color-mix(in srgb, var(--color-paper) 65%, transparent);
+    color: color-mix(in srgb, var(--color-card) 65%, transparent);
     font-size: 0.8125rem;
   }
 
   .name {
     font-size: 1.35rem;
-    color: var(--color-paper);
+    color: var(--color-card);
   }
 
   .row {
     background: var(--color-card);
-    color: var(--color-ink);
+    color: var(--color-text);
     border-radius: var(--radius-sm);
     padding: 0.85rem 1rem;
     display: flex;
@@ -85,19 +85,19 @@
 
   .hint {
     font-size: 0.8125rem;
-    color: var(--color-muted);
+    color: var(--color-text-secondary);
   }
 
   .stat {
     font-family: var(--font-heading);
     font-size: 1.125rem;
-    color: var(--color-seal);
+    color: var(--color-accent);
     white-space: nowrap;
   }
 
   .gold-divider {
     border: none;
-    border-top: 1px solid var(--color-gold);
+    border-top: 1px solid var(--color-border);
     opacity: 0.5;
     margin: 0.25rem 0;
   }
@@ -126,7 +126,7 @@
 
   .holiday-name {
     font-size: 0.9375rem;
-    color: var(--color-paper);
+    color: var(--color-card);
   }
 
   .holiday-date {
