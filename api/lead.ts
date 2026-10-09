@@ -29,8 +29,6 @@ type Lead = {
   notes: string;
 };
 
-type Validation = { ok: true; lead: Lead } | { ok: false; message: string };
-
 function json(status: number, body: Record<string, unknown>, extraHeaders: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -60,29 +58,31 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function validate(raw: Record<string, unknown>): Validation {
+// Returns the cleaned lead, or a string with the error to show the visitor. Vercel type-checks api/ without
+// strictNullChecks, where a { ok: true } | { ok: false } union doesn't narrow, so a typeof check is used instead.
+function validate(raw: Record<string, unknown>): Lead | string {
   const name = cleanLine(raw.name);
-  if (!name) return { ok: false, message: 'Please enter your name.' };
-  if (name.length > 120) return { ok: false, message: 'Name is too long (120 characters max).' };
+  if (!name) return 'Please enter your name.';
+  if (name.length > 120) return 'Name is too long (120 characters max).';
 
   const company = cleanLine(raw.company);
-  if (!company) return { ok: false, message: 'Please enter your company name.' };
-  if (company.length > 160) return { ok: false, message: 'Company name is too long (160 characters max).' };
+  if (!company) return 'Please enter your company name.';
+  if (company.length > 160) return 'Company name is too long (160 characters max).';
 
   const email = cleanLine(raw.email);
   if (!email || email.length > 254 || !EMAIL_RE.test(email)) {
-    return { ok: false, message: 'Please enter a valid work email.' };
+    return 'Please enter a valid work email.';
   }
 
   const peopleRaw = typeof raw.people === 'string' ? raw.people.trim() : raw.people;
   const people =
     typeof peopleRaw === 'number' ? peopleRaw : /^\d+$/.test(String(peopleRaw)) ? Number(peopleRaw) : NaN;
   if (!Number.isInteger(people) || people < 1 || people > 100000) {
-    return { ok: false, message: 'Team size must be a whole number of at least 1.' };
+    return 'Team size must be a whole number of at least 1.';
   }
 
   const notes = cleanMultiline(raw.notes);
-  if (notes.length > 2000) return { ok: false, message: 'Notes are too long (2000 characters max).' };
+  if (notes.length > 2000) return 'Notes are too long (2000 characters max).';
 
   const interests = Array.isArray(raw.interests)
     ? [...new Set(raw.interests)].filter(
@@ -91,7 +91,7 @@ function validate(raw: Record<string, unknown>): Validation {
       )
     : [];
 
-  return { ok: true, lead: { name, company, email, people, interests, notes } };
+  return { name, company, email, people, interests, notes };
 }
 
 function buildEmail(lead: Lead): { subject: string; html: string; text: string } {
@@ -245,9 +245,8 @@ export default {
       return json(200, { ok: true });
     }
 
-    const result = validate(body);
-    if (!result.ok) return json(400, { ok: false, message: result.message });
-    const { lead } = result;
+    const lead = validate(body);
+    if (typeof lead === 'string') return json(400, { ok: false, message: lead });
 
     const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
     const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY;
