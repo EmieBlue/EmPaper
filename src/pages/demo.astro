@@ -84,8 +84,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
 
     const GENERIC_ERROR = 'Something went wrong — please try again.';
-    // Reused across retries so the owner never gets two emails for one submission.
-    const submissionId = crypto.randomUUID();
 
     function showError(message: string) {
       if (!errorMessage) return;
@@ -131,7 +129,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             interests: data.getAll('interests'),
             notes: data.get('notes'),
             website: data.get('website'),
-            submissionId,
           }),
           signal: AbortSignal.timeout(15000),
         });

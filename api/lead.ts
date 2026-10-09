@@ -1,6 +1,8 @@
-// Vercel Function for the /demo form: validate, save the lead to Supabase, then email the owner via Resend.
+// Vercel Function for the /demo form: validate, save the lead to Supabase, then email the owner through Gmail SMTP.
 // The demo page treats a 404 from this route as "function not deployed" and falls back to a direct insert,
 // so this handler must never return 404.
+
+import nodemailer from 'nodemailer';
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -16,7 +18,6 @@ const INTEREST_LABELS: Record<string, string> = {
 const MAX_BODY_BYTES = 20_000;
 const UPSTREAM_TIMEOUT_MS = 8000;
 const EMAIL_RE = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]{2,}$/;
-const SUBMISSION_ID_RE = /^[\w-]{8,100}$/;
 const GENERIC_ERROR = "We couldn't save your request. Please try again.";
 
 type Lead = {
@@ -169,38 +170,51 @@ async function insertLead(lead: Lead, supabaseUrl: string, anonKey: string): Pro
   return response.status;
 }
 
-async function notifyOwner(lead: Lead, submissionId: string): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('Timed out')), ms);
+  });
+  return Promise.race([promise, deadline]).finally(() => clearTimeout(timer));
+}
+
+function describeMailError(err: unknown, lead: Lead): string {
+  const { code, responseCode, message } = (err ?? {}) as { code?: unknown; responseCode?: unknown; message?: unknown };
+  const parts = [`error=${errorName(err)}`];
+  if (typeof code === 'string') parts.push(`code=${code}`);
+  if (typeof responseCode === 'number') parts.push(`smtp=${responseCode}`);
+  if (typeof message === 'string') parts.push(redact(message, lead));
+  return parts.join(' ');
+}
+
+async function notifyOwner(lead: Lead): Promise<void> {
+  const user = process.env.GMAIL_USER;
+  // Google displays app passwords in four groups separated by spaces; the spaces aren't part of the password.
+  const pass = process.env.GMAIL_APP_PASSWORD?.replace(/\s+/g, '');
   const to = process.env.LEAD_NOTIFY_EMAIL;
-  if (!apiKey || !to) {
-    console.warn('NOTIFY_SKIPPED: RESEND_API_KEY or LEAD_NOTIFY_EMAIL is not set');
+  if (!user || !pass || !to) {
+    console.warn('NOTIFY_SKIPPED: GMAIL_USER, GMAIL_APP_PASSWORD or LEAD_NOTIFY_EMAIL is not set');
     return;
   }
 
   const { subject, html, text } = buildEmail(lead);
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${apiKey}`,
-    'Content-Type': 'application/json',
-  };
-  if (SUBMISSION_ID_RE.test(submissionId)) headers['Idempotency-Key'] = submissionId;
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      from: process.env.LEAD_FROM_EMAIL || 'EmPaper Leads <onboarding@resend.dev>',
-      to: [to],
-      reply_to: lead.email,
-      subject,
-      html,
-      text,
-    }),
-    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+  const transport = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { user, pass },
   });
 
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    console.error(`NOTIFY_FAILED status=${response.status} ${redact(detail, lead)}`);
+  try {
+    // Gmail always sends as the authenticated account, whatever "from" says. The promise form must be awaited on Vercel.
+    await withTimeout(
+      transport.sendMail({ from: `"EmPaper Leads" <${user}>`, to, replyTo: lead.email, subject, html, text }),
+      UPSTREAM_TIMEOUT_MS,
+    );
+  } catch (err) {
+    console.error(`NOTIFY_FAILED ${describeMailError(err, lead)}`);
+  } finally {
+    transport.close();
   }
 }
 
@@ -253,9 +267,8 @@ export default {
       return json(502, { ok: false, message: GENERIC_ERROR });
     }
 
-    const submissionId = typeof body.submissionId === 'string' ? body.submissionId : '';
     try {
-      await notifyOwner(lead, submissionId);
+      await notifyOwner(lead);
     } catch (err) {
       console.error(`NOTIFY_FAILED error=${errorName(err)}`);
     }
