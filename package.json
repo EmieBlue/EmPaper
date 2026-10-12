@@ -9,7 +9,12 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check:api:loose": "tsc --noEmit --skipLibCheck --strict false --target es2022 --module esnext --moduleResolution bundler --lib es2023,dom --types node api/lead.ts",
+    "check:api:strict": "tsc --noEmit --skipLibCheck --strict --target es2022 --module esnext --moduleResolution bundler --lib es2023,dom --types node api/lead.ts",
+    "check:api": "npm run check:api:loose && npm run check:api:strict",
+    "test": "node tests/lead.test.mjs",
+    "ci": "npm run check:api && npm test && npm run build"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
@@ -22,7 +27,9 @@
     "esbuild": true
   },
   "devDependencies": {
+    "@types/node": "^24.19.2",
     "@types/nodemailer": "^8.0.2",
+    "typescript": "~5.9.3",
     "vercel": "^62.7.0"
   }
 }
