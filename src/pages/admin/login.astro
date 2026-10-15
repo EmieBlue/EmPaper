@@ -1,0 +1,69 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Sign in" bare>
+  <div class="card">
+    <h1>Owner sign-in</h1>
+    <p class="lede">EmPaper owner console. Only the owner can sign in here.</p>
+    <form id="login" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+      </div>
+      <p class="msg" id="msg" role="status"></p>
+      <button class="btn-app" type="submit" id="go">Sign in</button>
+    </form>
+  </div>
+
+  <script>
+    import { getClient, isOwner } from '../../lib/admin-session';
+
+    const form = document.getElementById('login') as HTMLFormElement;
+    const msg = document.getElementById('msg') as HTMLElement;
+    const go = document.getElementById('go') as HTMLButtonElement;
+
+    function say(text: string, kind: 'error' | 'ok' | '' = '') {
+      msg.textContent = text;
+      msg.className = `msg ${kind}`.trim();
+    }
+
+    // Already signed in as the owner? Skip the form.
+    getClient()
+      .then(async (supabase) => {
+        if (await isOwner(supabase)) location.replace('/admin');
+      })
+      .catch(() => {});
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
+      const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+      if (!email || !password) {
+        say('Enter your email and password.', 'error');
+        return;
+      }
+      go.disabled = true;
+      say('Signing in…');
+      try {
+        const supabase = await getClient();
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        // One message for every failure so the page never reveals which part was wrong.
+        if (error || !(await isOwner(supabase))) {
+          await supabase.auth.signOut();
+          say("That email or password didn't work.", 'error');
+          go.disabled = false;
+          return;
+        }
+        location.replace('/admin');
+      } catch {
+        say("That didn't work. Check your internet and try again.", 'error');
+        go.disabled = false;
+      }
+    });
+  </script>
+</AppLayout>
