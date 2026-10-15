@@ -33,11 +33,26 @@ await test(`newest migration ${migrations.at(-1)} is safe to run a second time`,
   await db.exec(read(`supabase/migrations/${migrations.at(-1)}`));
 });
 
-await test('owner seed inserts exactly one owner', async () => {
-  await db.exec(`insert into auth.users (email) values ('owner@example.test'), ('other@example.test');`);
-  await db.exec(read('supabase/seed/owner_seed.sql').replaceAll('CHANGE-ME@example.com', 'owner@example.test'));
+await test('owner seed makes exactly one owner and shows their email', async () => {
+  await db.exec(`insert into auth.users (email) values ('Owner@Example.test'), ('other@example.test');`);
+  // typed in a different case on purpose: the seed must still match
+  const out = await db.exec(read('supabase/seed/owner_seed.sql').replaceAll('CHANGE-ME@example.com', 'OWNER@example.TEST'));
+  const shown = out.at(-1)?.rows ?? [];
+  assert.equal(shown.length, 1, 'the seed must end by showing exactly one owner row');
+  assert.equal(shown[0].owner_email, 'Owner@Example.test');
   const { rows } = await db.query('select count(*)::int as n from public.platform_admins');
   assert.equal(rows[0].n, 1);
+});
+
+await test('owner seed with a wrong email adds nobody and shows no rows', async () => {
+  const other = new PGlite();
+  await other.exec(read('tests/support/supabase-shim.sql'));
+  for (const file of migrations) {
+    await other.exec(read(`supabase/migrations/${file}`).replace('create extension if not exists pgcrypto;', ''));
+  }
+  await other.exec(`insert into auth.users (email) values ('real@example.test');`);
+  const out = await other.exec(read('supabase/seed/owner_seed.sql').replaceAll('CHANGE-ME@example.com', 'typo@example.test'));
+  assert.equal((out.at(-1)?.rows ?? []).length, 0);
 });
 
 for (const file of sqlFiles('supabase/tests')) {

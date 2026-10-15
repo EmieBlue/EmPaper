@@ -13,7 +13,7 @@ select set_config('empaper_test.rando', gen_random_uuid()::text, true);
 
 do $$ begin
   if nullif(current_setting('empaper_test.owner', true), '') is null then
-    raise exception 'FAIL: no owner found. Run supabase/seed/owner_seed.sql first (with your email).';
+    raise exception 'FAIL: no owner found. Run supabase/seed/owner_seed.sql first with your email. If you did, the email did not match a user: check Authentication -> Users.';
   end if;
 end $$;
 
