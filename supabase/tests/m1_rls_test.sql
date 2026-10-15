@@ -18,7 +18,7 @@ do $$ begin
 end $$;
 
 delete from public.audit_log where action = 'rls_test';
-delete from public.leads where name like 'RLS_TEST_%';
+delete from public.leads where starts_with(name, 'RLS_TEST_');
 insert into public.leads (name, company_name, work_email, number_of_people)
 values ('RLS_TEST_1', 'RLS Co', 'rls1@example.test', 5),
        ('RLS_TEST_2', 'RLS Co', 'rls2@example.test', 6);
@@ -54,13 +54,13 @@ begin
   exception when insufficient_privilege then null; end;
 
   begin
-    update public.leads set owner_notes = 'hack' where name like 'RLS_TEST_%';
+    update public.leads set owner_notes = 'hack' where starts_with(name, 'RLS_TEST_');
     get diagnostics n = row_count;
     if n <> 0 then raise exception 'FAIL: a visitor could update % leads', n; end if;
   exception when insufficient_privilege then null; end;
 
   begin
-    delete from public.leads where name like 'RLS_TEST_%';
+    delete from public.leads where starts_with(name, 'RLS_TEST_');
     get diagnostics n = row_count;
     if n <> 0 then raise exception 'FAIL: a visitor could delete % leads', n; end if;
   exception when insufficient_privilege then null; end;
@@ -83,11 +83,11 @@ begin
   select count(*) into n from public.leads;
   if n <> 0 then raise exception 'FAIL: a non-owner can read % leads', n; end if;
 
-  update public.leads set owner_notes = 'hack' where name like 'RLS_TEST_%';
+  update public.leads set owner_notes = 'hack' where starts_with(name, 'RLS_TEST_');
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'FAIL: a non-owner could update % leads', n; end if;
 
-  delete from public.leads where name like 'RLS_TEST_%';
+  delete from public.leads where starts_with(name, 'RLS_TEST_');
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'FAIL: a non-owner could delete % leads', n; end if;
 
@@ -128,7 +128,7 @@ declare n int; v_id uuid; v_contacted timestamptz;
 begin
   if not public.is_platform_admin() then raise exception 'FAIL: the owner is not recognised as owner'; end if;
 
-  select count(*) into n from public.leads where name like 'RLS_TEST_%';
+  select count(*) into n from public.leads where starts_with(name, 'RLS_TEST_');
   if n < 3 then raise exception 'FAIL: the owner sees only % test leads (expected 3)', n; end if;
 
   update public.leads set status = 'contacted', owner_notes = 'a note' where name = 'RLS_TEST_1';
@@ -175,7 +175,7 @@ do $$
 declare n int;
 begin
   if public.is_platform_admin() then raise exception 'FAIL: with 2-step required, a single-step session is accepted'; end if;
-  select count(*) into n from public.leads where name like 'RLS_TEST_%';
+  select count(*) into n from public.leads where starts_with(name, 'RLS_TEST_');
   if n <> 0 then raise exception 'FAIL: with 2-step required, a single-step session can read leads'; end if;
 end $$;
 
@@ -186,7 +186,7 @@ do $$
 declare n int;
 begin
   if not public.is_platform_admin() then raise exception 'FAIL: a 2-step session is not accepted'; end if;
-  select count(*) into n from public.leads where name like 'RLS_TEST_%';
+  select count(*) into n from public.leads where starts_with(name, 'RLS_TEST_');
   if n < 1 then raise exception 'FAIL: a 2-step session cannot read leads'; end if;
 end $$;
 
@@ -197,8 +197,8 @@ update public.platform_admins
   where user_id = current_setting('empaper_test.owner')::uuid;
 delete from public.audit_log
   where action = 'rls_test'
-     or (entity_type = 'lead' and entity_id in (select id from public.leads where name like 'RLS_TEST_%'));
-delete from public.leads where name like 'RLS_TEST_%';
+     or (entity_type = 'lead' and entity_id in (select id from public.leads where starts_with(name, 'RLS_TEST_')));
+delete from public.leads where starts_with(name, 'RLS_TEST_');
 
 rollback;
 

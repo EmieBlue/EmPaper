@@ -50,7 +50,7 @@ for (const file of sqlFiles('supabase/tests')) {
 
 await test('the permission tests leave no test data behind', async () => {
   const { rows } = await db.query(
-    `select (select count(*) from public.leads where name like 'RLS_TEST_%')::int as leads,
+    `select (select count(*) from public.leads where starts_with(name, 'RLS_TEST_'))::int as leads,
             (select count(*) from public.audit_log)::int as audit`,
   );
   assert.deepEqual(rows[0], { leads: 0, audit: 0 });
