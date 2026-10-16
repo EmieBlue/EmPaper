@@ -50,6 +50,10 @@ import AppLayout from '../../layouts/AppLayout.astro';
       <dd id="d-received"></dd>
       <dt>Interested in</dt>
       <dd id="d-interests"></dd>
+      <dt>Logo</dt>
+      <dd id="d-logo"></dd>
+      <dt>Brand colours</dt>
+      <dd id="d-colours"></dd>
       <dt>Their note</dt>
       <dd id="d-notes"></dd>
       <dt>First contacted</dt>
@@ -69,7 +73,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
 
   <script>
     import { requireOwner } from '../../lib/admin-session';
-    import { LEAD_STATUSES, STATUS_LABELS, interestLabel, isLeadStatus, statusLabel } from '../../lib/lead-status';
+    import { LEAD_STATUSES, STATUS_LABELS, interestLabel, isLeadStatus, logoLabel, statusLabel } from '../../lib/lead-status';
 
     type Lead = {
       id: string;
@@ -79,6 +83,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
       number_of_people: number;
       interested_features: string[] | null;
       notes: string | null;
+      logo_status: string | null;
+      brand_colours: string | null;
       status: string;
       owner_notes: string | null;
       contacted_at: string | null;
@@ -170,6 +176,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
       $('d-people').textContent = String(lead.number_of_people);
       $('d-received').textContent = when(lead.created_at);
       $('d-interests').textContent = (lead.interested_features ?? []).map(interestLabel).join(', ') || 'Nothing ticked';
+      $('d-logo').textContent = logoLabel(lead.logo_status);
+      $('d-colours').textContent = lead.brand_colours || 'Not given';
       $('d-notes').textContent = lead.notes || 'None';
       $('d-contacted').textContent = when(lead.contacted_at);
       statusEl.value = isLeadStatus(lead.status) ? lead.status : 'new';
@@ -209,7 +217,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
       client = supabase;
       const { data, error } = await client
         .from('leads')
-        .select('id, name, company_name, work_email, number_of_people, interested_features, notes, status, owner_notes, contacted_at, created_at')
+        .select('id, name, company_name, work_email, number_of_people, interested_features, notes, logo_status, brand_colours, status, owner_notes, contacted_at, created_at')
         .order('created_at', { ascending: false });
       if (error || !data) {
         say(msg, "That didn't load. Check your internet and refresh.", 'error');

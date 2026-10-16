@@ -209,6 +209,33 @@ await test('empty notes stored as empty string and shown as a dash', async () =>
   assert.ok(sentMail[0].text.includes('Notes: —'));
 });
 
+await test('logo answer and brand colours: stored and emailed; skipped ones are not sent at all', async () => {
+  await post(validBody({ logoStatus: 'no', brandColours: '  navy\nand gold ' }));
+  assert.equal(insertBody().logo_status, 'no');
+  assert.equal(insertBody().brand_colours, 'navy and gold');
+  assert.ok(sentMail[0].text.includes('Logo: No logo yet') && sentMail[0].text.includes('Brand colours: navy and gold'));
+});
+
+await test('logo and colours skipped: the insert has no new columns and the email says so', async () => {
+  await post(validBody({ logoStatus: '', brandColours: '   ' }));
+  assert.ok(!('logo_status' in insertBody()) && !('brand_colours' in insertBody()));
+  assert.ok(sentMail[0].text.includes('Logo: Not answered') && sentMail[0].text.includes('Brand colours: —'));
+});
+
+await test('bad logo answer or over-long colours: 400, nothing saved or sent', async () => {
+  for (const body of [validBody({ logoStatus: 'maybe' }), validBody({ logoStatus: '__proto__' }), validBody({ brandColours: 'c'.repeat(101) })]) {
+    const res = await post(body);
+    assert.equal(res.status, 400);
+  }
+  assert.equal(fetchCalls.length + sentMail.length, 0);
+  assert.equal((await post(validBody({ brandColours: 'c'.repeat(100) }))).status, 200);
+});
+
+await test('HTML in brand colours is escaped in the email html', async () => {
+  await post(validBody({ brandColours: '<script>alert(1)</script>' }));
+  assert.ok(!sentMail[0].html.includes('<script>'));
+});
+
 await test('multiple recipients in LEAD_NOTIFY_EMAIL pass through unchanged', async () => {
   process.env.LEAD_NOTIFY_EMAIL = 'a@example.com, b@example.com';
   await post(validBody());
