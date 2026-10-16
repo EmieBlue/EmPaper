@@ -23,13 +23,14 @@ The founder is one non-technical person. Explain things in short, plain English 
 - Demo form with interest checkboxes and notes; every request is saved and emailed to the founder.
 - GitHub workflow, automatic checks and protected `main`.
 - **Phase 1 (merged, #21):** `platform_admins` (who is the owner), `is_platform_admin()`, leads pipeline columns (status, owner notes, contacted time), `audit_log`, tightened public insert rule. Tested locally in CI with PGlite and in the real Supabase ("M1 RLS: ALL PASS").
+- **Demo form branding hints (merged, #24):** two optional text questions on /demo, "Does your company have a logo?" (`leads.logo_status`: yes / no / unsure) and "Brand colours" (`leads.brand_colours`, max 100 characters). Shown in the alert email and in /admin/leads. Deliberately NO file upload on the public form (spam, storage cost, unsafe files, fewer completions). Migration `20261016100000_add_lead_branding_hints.sql` and test `m1b_lead_branding_test.sql` were applied in Supabase ("M1b ALL PASS"). Also `docs/EmPaper-how-it-works.pdf`, a 2-page plain-English overview for the founder.
 - **Phase 2 (merged, #22):** owner console at `/admin` (sign-in, overview counts, demo requests list with status and private notes). Verified by the founder against the real database.
 
 ## What is next (one pull request each)
 
 - **Phase 0 leftovers (founder, no code):** turn off public sign-ups in Supabase; set Auth Site URL to `https://em-paper.vercel.app` and redirects `https://*-haulio-cargo.vercel.app/**` and `http://localhost:4321/**`; add `SUPABASE_SERVICE_ROLE_KEY` in Vercel as Sensitive (Production and Preview, never pasted in chat); 2-step login on Supabase, Vercel and GitHub; delete the test lead in Supabase; buy a domain. Ask the founder which are still open.
 - **P3:** convert a lead to a client company (migration M2: company branding columns and a `convert_lead_to_company` function, plus Companies pages).
-- **P4:** branding link the founder sends to a client; the client uploads a logo and picks colours; founder approves (migration M3, `api/brand.ts`).
+- **P4:** branding link the founder sends to a client; the client uploads a logo and picks colours; founder approves (migration M3, `api/brand.ts`). The page also offers **"We don't have a logo"**: then `branding_submissions.logo_path` is nullable with `no_logo boolean not null default false` (a submission needs a logo, or no_logo, or at least colours), and the portal shows a text wordmark (the company display name in the brand colour) instead of an image.
 - **P5:** "Invite HR admin" produces a copy-and-send link (no automatic email until a domain exists) (migration M4, `api/invite-hr.ts`, accept-invite and welcome pages).
 - **P6 (optional):** 2-step login for the owner inside the app. **P7 (optional):** audit page.
 - Later: pricing page (#2, show both GHS and USD), privacy page (#3), domain and email (#4), HR portal and employee portal (#11).
