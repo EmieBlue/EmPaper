@@ -1,0 +1,40 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Overview" active="overview">
+  <h1>Overview</h1>
+  <p class="lede">Where your demo requests stand.</p>
+
+  <div class="stats" id="stats" aria-live="polite">
+    <div class="card stat"><strong id="n-new">–</strong><span>New</span></div>
+    <div class="card stat"><strong id="n-contacted">–</strong><span>I've contacted them</span></div>
+    <div class="card stat"><strong id="n-qualified">–</strong><span>Good fit</span></div>
+    <div class="card stat"><strong id="n-converted">–</strong><span>Became a client</span></div>
+  </div>
+
+  <p class="msg" id="msg" role="status"></p>
+  <a class="btn-app" href="/admin/leads" style="display: inline-block; text-decoration: none">Open demo requests</a>
+
+  <script>
+    import { requireOwner } from '../../lib/admin-session';
+    import { countByStatus } from '../../lib/lead-status';
+
+    const msg = document.getElementById('msg') as HTMLElement;
+
+    requireOwner().then(async (supabase) => {
+      if (!supabase) return;
+      const { data, error } = await supabase.from('leads').select('status');
+      if (error || !data) {
+        msg.textContent = "That didn't load. Check your internet and refresh.";
+        msg.className = 'msg error';
+        return;
+      }
+      const counts = countByStatus(data);
+      for (const key of ['new', 'contacted', 'qualified', 'converted'] as const) {
+        const el = document.getElementById(`n-${key}`);
+        if (el) el.textContent = String(counts[key]);
+      }
+    });
+  </script>
+</AppLayout>

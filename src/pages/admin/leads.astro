@@ -1,0 +1,222 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Demo requests" active="leads">
+  <h1>Demo requests</h1>
+  <p class="lede">Everyone who filled in the demo form. Newest first. Click a row to open it.</p>
+
+  <div class="toolbar">
+    <label for="filter">Show</label>
+    <select id="filter">
+      <option value="all">Everything</option>
+      <option value="new">New</option>
+      <option value="contacted">I've contacted them</option>
+      <option value="qualified">Good fit</option>
+      <option value="converted">Became a client</option>
+      <option value="lost">Not going ahead</option>
+    </select>
+    <span class="msg" id="msg" role="status"></span>
+  </div>
+
+  <div class="card table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Received</th>
+          <th scope="col">Name</th>
+          <th scope="col">Company</th>
+          <th scope="col">People</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="empty" id="empty" hidden>
+      No demo requests yet. When someone fills in the demo form, they will appear here.
+    </p>
+  </div>
+
+  <div class="card detail" id="detail" hidden>
+    <h2 id="d-title"></h2>
+    <dl>
+      <dt>Email</dt>
+      <dd id="d-email"></dd>
+      <dt>Company</dt>
+      <dd id="d-company"></dd>
+      <dt>People</dt>
+      <dd id="d-people"></dd>
+      <dt>Received</dt>
+      <dd id="d-received"></dd>
+      <dt>Interested in</dt>
+      <dd id="d-interests"></dd>
+      <dt>Their note</dt>
+      <dd id="d-notes"></dd>
+      <dt>First contacted</dt>
+      <dd id="d-contacted"></dd>
+    </dl>
+    <div class="field">
+      <label for="d-status">Status</label>
+      <select id="d-status"></select>
+    </div>
+    <div class="field">
+      <label for="d-owner-notes">My notes (only you can see these)</label>
+      <textarea id="d-owner-notes" rows="4"></textarea>
+    </div>
+    <p class="msg" id="d-msg" role="status"></p>
+    <button class="btn-app" type="button" id="d-save">Save</button>
+  </div>
+
+  <script>
+    import { requireOwner } from '../../lib/admin-session';
+    import { LEAD_STATUSES, STATUS_LABELS, interestLabel, isLeadStatus, statusLabel } from '../../lib/lead-status';
+
+    type Lead = {
+      id: string;
+      name: string;
+      company_name: string;
+      work_email: string;
+      number_of_people: number;
+      interested_features: string[] | null;
+      notes: string | null;
+      status: string;
+      owner_notes: string | null;
+      contacted_at: string | null;
+      created_at: string;
+    };
+
+    // Lead data comes from a public form, so everything below is written with textContent, never innerHTML.
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const rowsEl = $('rows');
+    const emptyEl = $('empty');
+    const detailEl = $('detail');
+    const filterEl = $<HTMLSelectElement>('filter');
+    const statusEl = $<HTMLSelectElement>('d-status');
+    const notesEl = $<HTMLTextAreaElement>('d-owner-notes');
+    const saveEl = $<HTMLButtonElement>('d-save');
+    const msg = $('msg');
+    const dMsg = $('d-msg');
+
+    let leads: Lead[] = [];
+    let selectedId: string | null = null;
+    let client: NonNullable<Awaited<ReturnType<typeof requireOwner>>>;
+
+    const when = (iso: string | null) => (iso ? new Date(iso).toLocaleString() : 'Not yet');
+
+    function say(el: HTMLElement, text: string, kind: 'error' | 'ok' | '' = '') {
+      el.textContent = text;
+      el.className = `msg ${kind}`.trim();
+    }
+
+    for (const s of LEAD_STATUSES) {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = STATUS_LABELS[s];
+      statusEl.append(opt);
+    }
+
+    function cell(text: string): HTMLTableCellElement {
+      const td = document.createElement('td');
+      td.textContent = text;
+      return td;
+    }
+
+    function renderRows() {
+      const f = filterEl.value;
+      const shown = leads.filter((l) => f === 'all' || l.status === f);
+      rowsEl.replaceChildren();
+      emptyEl.hidden = shown.length > 0;
+      emptyEl.textContent =
+        leads.length === 0
+          ? 'No demo requests yet. When someone fills in the demo form, they will appear here.'
+          : 'Nothing with that status.';
+      for (const lead of shown) {
+        const tr = document.createElement('tr');
+        tr.className = 'row';
+        tr.tabIndex = 0;
+        tr.setAttribute('aria-selected', String(lead.id === selectedId));
+        const statusTd = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.dataset.status = lead.status;
+        badge.textContent = statusLabel(lead.status);
+        statusTd.append(badge);
+        tr.append(
+          cell(new Date(lead.created_at).toLocaleDateString()),
+          cell(lead.name),
+          cell(lead.company_name),
+          cell(String(lead.number_of_people)),
+          statusTd,
+        );
+        const open = () => select(lead.id);
+        tr.addEventListener('click', open);
+        tr.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            open();
+          }
+        });
+        rowsEl.append(tr);
+      }
+    }
+
+    function select(id: string) {
+      const lead = leads.find((l) => l.id === id);
+      if (!lead) return;
+      selectedId = id;
+      $('d-title').textContent = lead.name;
+      $('d-email').textContent = lead.work_email;
+      $('d-company').textContent = lead.company_name;
+      $('d-people').textContent = String(lead.number_of_people);
+      $('d-received').textContent = when(lead.created_at);
+      $('d-interests').textContent = (lead.interested_features ?? []).map(interestLabel).join(', ') || 'Nothing ticked';
+      $('d-notes').textContent = lead.notes || 'None';
+      $('d-contacted').textContent = when(lead.contacted_at);
+      statusEl.value = isLeadStatus(lead.status) ? lead.status : 'new';
+      notesEl.value = lead.owner_notes ?? '';
+      say(dMsg, '');
+      detailEl.hidden = false;
+      renderRows();
+      detailEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    saveEl.addEventListener('click', async () => {
+      const lead = leads.find((l) => l.id === selectedId);
+      if (!lead) return;
+      saveEl.disabled = true;
+      say(dMsg, 'Saving…');
+      const { data, error } = await client
+        .from('leads')
+        .update({ status: statusEl.value, owner_notes: notesEl.value.trim() || null })
+        .eq('id', lead.id)
+        .select('status, owner_notes, contacted_at')
+        .single();
+      saveEl.disabled = false;
+      if (error || !data) {
+        say(dMsg, "That didn't save. Check your internet and try again.", 'error');
+        return;
+      }
+      Object.assign(lead, data);
+      $('d-contacted').textContent = when(lead.contacted_at);
+      say(dMsg, 'Saved.', 'ok');
+      renderRows();
+    });
+
+    filterEl.addEventListener('change', renderRows);
+
+    requireOwner().then(async (supabase) => {
+      if (!supabase) return;
+      client = supabase;
+      const { data, error } = await client
+        .from('leads')
+        .select('id, name, company_name, work_email, number_of_people, interested_features, notes, status, owner_notes, contacted_at, created_at')
+        .order('created_at', { ascending: false });
+      if (error || !data) {
+        say(msg, "That didn't load. Check your internet and refresh.", 'error');
+        return;
+      }
+      leads = data as Lead[];
+      renderRows();
+    });
+  </script>
+</AppLayout>

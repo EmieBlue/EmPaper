@@ -1,0 +1,66 @@
+---
+import '@fontsource/newsreader/400.css';
+import '@fontsource/newsreader/500.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/600.css';
+import '../styles/global.css';
+import '../styles/app.css';
+
+// Private owner pages. Deliberately not BaseLayout: no marketing header/footer, and never indexed.
+// Do not use <section> inside app pages (global.css adds big padding to it).
+interface Props {
+  title: string;
+  active?: 'overview' | 'leads';
+  bare?: boolean; // true = centred card with no sidebar (sign-in page)
+}
+
+const { title, active, bare = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-auth={bare ? 'public' : 'checking'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} · EmPaper owner</title>
+  </head>
+  <body>
+    {
+      bare ? (
+        <div class="auth">
+          <slot />
+        </div>
+      ) : (
+        <div class="app">
+          <aside class="app-side" data-app>
+            <div class="app-brand">
+              EmPaper<small>Owner console</small>
+            </div>
+            <nav class="app-nav" aria-label="Owner console">
+              <a href="/admin" aria-current={active === 'overview' ? 'page' : undefined}>Overview</a>
+              <a href="/admin/leads" aria-current={active === 'leads' ? 'page' : undefined}>Demo requests</a>
+            </nav>
+            <button type="button" class="btn-quiet app-signout" id="signout">Sign out</button>
+          </aside>
+          <main class="app-main" data-app>
+            <slot />
+          </main>
+        </div>
+      )
+    }
+    {
+      !bare && (
+        <script>
+          import { getClient, LOGIN_PATH } from '../lib/admin-session';
+          document.getElementById('signout')?.addEventListener('click', async () => {
+            const supabase = await getClient();
+            await supabase.auth.signOut();
+            location.replace(LOGIN_PATH);
+          });
+        </script>
+      )
+    }
+  </body>
+</html>
