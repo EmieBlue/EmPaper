@@ -1,3 +1,7 @@
+## Start here
+
+Read [docs/HANDOFF.md](docs/HANDOFF.md) first: project state, decisions, design rules and how we work.
+
 ## Development
 
 When starting the dev server, use background mode:
