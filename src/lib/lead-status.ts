@@ -39,3 +39,16 @@ export function countByStatus(rows: ReadonlyArray<{ status?: unknown }>): Record
   for (const row of rows) if (isLeadStatus(row.status)) counts[row.status]++;
   return counts;
 }
+
+// Answer to "Do you have a logo?" on the demo form (leads.logo_status; empty = not answered).
+export const LOGO_LABELS: Record<string, string> = {
+  yes: 'Yes, they have a logo',
+  no: 'No logo yet',
+  unsure: 'Not sure',
+};
+
+export function logoLabel(value: unknown): string {
+  return typeof value === 'string' && Object.prototype.hasOwnProperty.call(LOGO_LABELS, value)
+    ? LOGO_LABELS[value]
+    : 'Not answered';
+}

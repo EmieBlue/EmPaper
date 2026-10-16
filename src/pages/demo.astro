@@ -54,6 +54,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </label>
         </fieldset>
 
+        <fieldset class="interests">
+          <legend>Does your company have a logo? (optional)</legend>
+          <label class="checkbox-row">
+            <input type="radio" name="logoStatus" value="yes" />
+            Yes
+          </label>
+          <label class="checkbox-row">
+            <input type="radio" name="logoStatus" value="no" />
+            No, not yet
+          </label>
+          <label class="checkbox-row">
+            <input type="radio" name="logoStatus" value="unsure" />
+            Not sure
+          </label>
+        </fieldset>
+
+        <label>
+          Your brand colours (optional)
+          <input type="text" name="brandColours" maxlength="100" placeholder="e.g. navy and gold, or #12304A" />
+        </label>
+
         <label>
           Anything else we should know? (optional)
           <textarea name="notes" rows="3"></textarea>
@@ -101,6 +122,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         number_of_people: Number(data.get('people')),
         interested_features: data.getAll('interests').map(String),
         notes: String(data.get('notes') ?? ''),
+        // Empty answers are left out, like the function does, so they stay empty in the database.
+        ...(data.get('logoStatus') ? { logo_status: String(data.get('logoStatus')) } : {}),
+        ...(String(data.get('brandColours') ?? '').trim() ? { brand_colours: String(data.get('brandColours')).trim() } : {}),
       });
       if (error) {
         console.error('Failed to submit demo request', error);
@@ -128,6 +152,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             people: data.get('people'),
             interests: data.getAll('interests'),
             notes: data.get('notes'),
+            logoStatus: data.get('logoStatus') ?? '',
+            brandColours: data.get('brandColours') ?? '',
             website: data.get('website'),
           }),
           signal: AbortSignal.timeout(15000),

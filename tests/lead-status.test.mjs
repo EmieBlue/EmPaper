@@ -51,6 +51,22 @@ test('countByStatus counts and ignores bad rows', () => {
   assert.deepEqual(c, { new: 2, contacted: 0, qualified: 0, converted: 0, lost: 1 });
 });
 
+test('logoLabel gives plain words and a safe fallback', () => {
+  assert.equal(mod.logoLabel('yes'), 'Yes, they have a logo');
+  assert.equal(mod.logoLabel('no'), 'No logo yet');
+  assert.equal(mod.logoLabel('unsure'), 'Not sure');
+  assert.equal(mod.logoLabel(null), 'Not answered');
+  assert.equal(mod.logoLabel('__proto__'), 'Not answered');
+});
+
+test('the database check and the app agree on logo answers', () => {
+  const sql = readFileSync(new URL('../supabase/migrations/20261016100000_add_lead_branding_hints.sql', import.meta.url), 'utf8');
+  const m = sql.match(/logo_status in \(([^)]*)\)/);
+  assert.ok(m, 'logo check not found in migration');
+  const fromSql = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]).sort();
+  assert.deepEqual(fromSql, Object.keys(mod.LOGO_LABELS).sort());
+});
+
 let failed = 0;
 for (const [ok, name] of results) {
   if (!ok) failed++;

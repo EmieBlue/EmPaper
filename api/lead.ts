@@ -15,6 +15,12 @@ const INTEREST_LABELS: Record<string, string> = {
   inbox_instant_answers: 'Inbox & Instant Answers',
 };
 
+const LOGO_LABELS: Record<string, string> = {
+  yes: 'Yes, they have a logo',
+  no: 'No logo yet',
+  unsure: 'Not sure',
+};
+
 const MAX_BODY_BYTES = 20_000;
 const UPSTREAM_TIMEOUT_MS = 8000;
 const EMAIL_RE = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]{2,}$/;
@@ -27,6 +33,8 @@ type Lead = {
   people: number;
   interests: string[];
   notes: string;
+  logoStatus: string; // '' (not answered) or a key of LOGO_LABELS
+  brandColours: string;
 };
 
 function json(status: number, body: Record<string, unknown>, extraHeaders: Record<string, string> = {}): Response {
@@ -84,6 +92,16 @@ function validate(raw: Record<string, unknown>): Lead | string {
   const notes = cleanMultiline(raw.notes);
   if (notes.length > 2000) return 'Notes are too long (2000 characters max).';
 
+  // Optional, text-only hints about the company's look. The real logo upload happens later, on a private branding link.
+  const logoRaw = typeof raw.logoStatus === 'string' ? raw.logoStatus.trim() : '';
+  if (logoRaw && !Object.prototype.hasOwnProperty.call(LOGO_LABELS, logoRaw)) {
+    return 'Please choose Yes, No or Not sure for the logo question.';
+  }
+  const logoStatus = logoRaw;
+
+  const brandColours = cleanLine(raw.brandColours);
+  if (brandColours.length > 100) return 'Brand colours is too long (100 characters max).';
+
   const interests = Array.isArray(raw.interests)
     ? [...new Set(raw.interests)].filter(
         (slug): slug is string =>
@@ -91,7 +109,7 @@ function validate(raw: Record<string, unknown>): Lead | string {
       )
     : [];
 
-  return { name, company, email, people, interests, notes };
+  return { name, company, email, people, interests, notes, logoStatus, brandColours };
 }
 
 function buildEmail(lead: Lead): { subject: string; html: string; text: string } {
@@ -107,6 +125,8 @@ function buildEmail(lead: Lead): { subject: string; html: string; text: string }
     ['Team size', String(lead.people)],
     ['Interested in', interests],
     ['Notes', lead.notes || '—'],
+    ['Logo', lead.logoStatus ? LOGO_LABELS[lead.logoStatus] : 'Not answered'],
+    ['Brand colours', lead.brandColours || '—'],
     ['Submitted', submittedAt],
   ];
 
@@ -164,6 +184,9 @@ async function insertLead(lead: Lead, supabaseUrl: string, anonKey: string): Pro
       number_of_people: lead.people,
       interested_features: lead.interests,
       notes: lead.notes,
+      // Only sent when answered, so a visitor who skips these never depends on the database having the new columns.
+      ...(lead.logoStatus ? { logo_status: lead.logoStatus } : {}),
+      ...(lead.brandColours ? { brand_colours: lead.brandColours } : {}),
     }),
     signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
   });
