@@ -11,6 +11,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
     <div class="card stat"><strong id="n-contacted">–</strong><span>I've contacted them</span></div>
     <div class="card stat"><strong id="n-qualified">–</strong><span>Good fit</span></div>
     <div class="card stat"><strong id="n-converted">–</strong><span>Became a client</span></div>
+    <div class="card stat"><strong id="n-clients">–</strong><span>Active clients</span></div>
   </div>
 
   <p class="msg" id="msg" role="status"></p>
@@ -30,6 +31,9 @@ import AppLayout from '../../layouts/AppLayout.astro';
         msg.className = 'msg error';
         return;
       }
+      const { count } = await supabase.from('companies').select('id', { count: 'exact', head: true }).eq('is_active', true);
+      const clientsEl = document.getElementById('n-clients');
+      if (clientsEl && typeof count === 'number') clientsEl.textContent = String(count);
       const counts = countByStatus(data);
       for (const key of ['new', 'contacted', 'qualified', 'converted'] as const) {
         const el = document.getElementById(`n-${key}`);

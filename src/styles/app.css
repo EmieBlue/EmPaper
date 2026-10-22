@@ -153,6 +153,7 @@ html[data-auth='checking'] .app [data-app] {
   font-size: 0.9rem;
 }
 
+:is(.app, .auth) input[type='text'],
 :is(.app, .auth) input[type='email'],
 :is(.app, .auth) input[type='password'],
 :is(.app, .auth) select,
@@ -164,6 +165,12 @@ html[data-auth='checking'] .app [data-app] {
   background: var(--color-card);
   color: var(--color-text);
   width: 100%;
+}
+
+:is(.app, .auth) .hint {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 :is(.app, .auth) .msg {
@@ -315,4 +322,9 @@ html[data-auth='checking'] .app [data-app] {
   :is(.app, .auth) .table-wrap {
     overflow-x: auto;
   }
+}
+
+/* Flex/grid rules above would otherwise override the hidden attribute (same trap as on the demo form). */
+:is(.app, .auth) [hidden] {
+  display: none !important;
 }
