@@ -1,0 +1,202 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Clients" active="companies">
+  <h1>Clients</h1>
+  <p class="lede">Companies you have turned from a demo request into a client. Click one to open it.</p>
+
+  <p class="msg" id="msg" role="status"></p>
+
+  <div class="card table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Client</th>
+          <th scope="col">Look and logo</th>
+          <th scope="col">Status</th>
+          <th scope="col">Added</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="empty" id="empty" hidden>No clients yet. When you convert a demo request, the client appears here.</p>
+  </div>
+
+  <div class="card detail" id="detail" hidden>
+    <h2 id="d-title"></h2>
+    <dl>
+      <dt>Web name</dt>
+      <dd id="d-slug"></dd>
+      <dt>Look and logo</dt>
+      <dd id="d-branding"></dd>
+      <dt>Added</dt>
+      <dd id="d-added"></dd>
+      <dt>Came from</dt>
+      <dd id="d-source"></dd>
+    </dl>
+    <div class="field">
+      <label for="d-name">Company name</label>
+      <input id="d-name" type="text" maxlength="160" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="d-display">Name shown to their staff</label>
+      <input id="d-display" type="text" maxlength="160" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="d-active">Access</label>
+      <select id="d-active">
+        <option value="true">Active</option>
+        <option value="false">Paused</option>
+      </select>
+      <p class="hint">For now this is only a label for you. Pausing does not stop their staff from signing in yet.</p>
+    </div>
+    <p class="msg" id="d-msg" role="status"></p>
+    <button class="btn-app" type="button" id="d-save">Save</button>
+  </div>
+
+  <script>
+    import { requireOwner } from '../../lib/admin-session';
+    import { activeLabel, brandingLabel } from '../../lib/company';
+
+    type Company = {
+      id: string;
+      name: string;
+      display_name: string | null;
+      slug: string | null;
+      is_active: boolean;
+      branding_status: string;
+      created_at: string;
+    };
+
+    // Company names started as visitor-typed text, so everything below is written with textContent, never innerHTML.
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const rowsEl = $('rows');
+    const emptyEl = $('empty');
+    const detailEl = $('detail');
+    const msg = $('msg');
+    const dMsg = $('d-msg');
+    const nameEl = $<HTMLInputElement>('d-name');
+    const displayEl = $<HTMLInputElement>('d-display');
+    const activeEl = $<HTMLSelectElement>('d-active');
+    const saveEl = $<HTMLButtonElement>('d-save');
+
+    let companies: Company[] = [];
+    let selectedId: string | null = null;
+    let client: NonNullable<Awaited<ReturnType<typeof requireOwner>>>;
+
+    const COLUMNS = 'id, name, display_name, slug, is_active, branding_status, created_at';
+
+    function say(el: HTMLElement, text: string, kind: 'error' | 'ok' | '' = '') {
+      el.textContent = text;
+      el.className = `msg ${kind}`.trim();
+    }
+
+    function cell(text: string): HTMLTableCellElement {
+      const td = document.createElement('td');
+      td.textContent = text;
+      return td;
+    }
+
+    function renderRows() {
+      rowsEl.replaceChildren();
+      emptyEl.hidden = companies.length > 0;
+      for (const c of companies) {
+        const tr = document.createElement('tr');
+        tr.className = 'row';
+        tr.tabIndex = 0;
+        tr.setAttribute('aria-selected', String(c.id === selectedId));
+        const statusTd = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.dataset.status = c.is_active ? 'converted' : 'lost';
+        badge.textContent = activeLabel(c.is_active);
+        statusTd.append(badge);
+        tr.append(cell(c.display_name || c.name), cell(brandingLabel(c.branding_status)), statusTd, cell(new Date(c.created_at).toLocaleDateString()));
+        const open = () => select(c.id);
+        tr.addEventListener('click', open);
+        tr.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            open();
+          }
+        });
+        rowsEl.append(tr);
+      }
+    }
+
+    async function select(id: string) {
+      const c = companies.find((x) => x.id === id);
+      if (!c) return;
+      selectedId = id;
+      $('d-title').textContent = c.display_name || c.name;
+      $('d-slug').textContent = c.slug ?? 'Not set';
+      $('d-branding').textContent = brandingLabel(c.branding_status);
+      $('d-added').textContent = new Date(c.created_at).toLocaleString();
+      $('d-source').textContent = 'Looking…';
+      nameEl.value = c.name;
+      displayEl.value = c.display_name ?? '';
+      activeEl.value = String(c.is_active);
+      say(dMsg, '');
+      detailEl.hidden = false;
+      renderRows();
+      detailEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Which demo request this client came from (leads.converted_company_id points back at the company).
+      const { data } = await client.from('leads').select('id, created_at').eq('converted_company_id', c.id).limit(1);
+      if (selectedId !== id) return;
+      const source = $('d-source');
+      source.replaceChildren();
+      if (data && data.length) {
+        const a = document.createElement('a');
+        a.href = '/admin/leads';
+        a.textContent = `Demo request from ${new Date(data[0].created_at).toLocaleDateString()}`;
+        source.append(a);
+      } else {
+        source.textContent = 'Added without a demo request';
+      }
+    }
+
+    saveEl.addEventListener('click', async () => {
+      const c = companies.find((x) => x.id === selectedId);
+      if (!c) return;
+      const name = nameEl.value.trim();
+      if (!name) {
+        say(dMsg, 'The company name cannot be empty.', 'error');
+        return;
+      }
+      saveEl.disabled = true;
+      say(dMsg, 'Saving…');
+      const { data, error } = await client
+        .from('companies')
+        .update({ name, display_name: displayEl.value.trim() || name, is_active: activeEl.value === 'true' })
+        .eq('id', c.id)
+        .select(COLUMNS)
+        .single();
+      saveEl.disabled = false;
+      if (error || !data) {
+        say(dMsg, "That didn't save. Check your internet and try again.", 'error');
+        return;
+      }
+      Object.assign(c, data);
+      $('d-title').textContent = c.display_name || c.name;
+      say(dMsg, 'Saved.', 'ok');
+      renderRows();
+    });
+
+    requireOwner().then(async (supabase) => {
+      if (!supabase) return;
+      client = supabase;
+      const { data, error } = await client.from('companies').select(COLUMNS).order('created_at', { ascending: false });
+      if (error || !data) {
+        say(msg, "That didn't load. Check your internet and refresh.", 'error');
+        return;
+      }
+      companies = data as Company[];
+      renderRows();
+      // Arriving from a lead's "open the client" link: /admin/companies?id=<uuid>
+      const wanted = new URLSearchParams(location.search).get('id');
+      if (wanted) select(wanted);
+    });
+  </script>
+</AppLayout>

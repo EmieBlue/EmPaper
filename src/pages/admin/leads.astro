@@ -59,9 +59,17 @@ import AppLayout from '../../layouts/AppLayout.astro';
       <dt>First contacted</dt>
       <dd id="d-contacted"></dd>
     </dl>
+    <div class="field" id="convert-box" hidden>
+      <label for="c-name">Turn this into a client</label>
+      <input id="c-name" type="text" maxlength="160" autocomplete="off" />
+      <p class="hint">This creates the client company and marks this request as "Became a client". You can rename the company first.</p>
+      <button class="btn-app" type="button" id="c-go">Convert to client</button>
+    </div>
+    <p class="msg ok" id="client-link" hidden>This request became a client: <a id="client-anchor" href="/admin/companies">open the client</a></p>
     <div class="field">
       <label for="d-status">Status</label>
       <select id="d-status"></select>
+      <p class="hint" id="status-hint" hidden>This request is a client now, so its status is locked.</p>
     </div>
     <div class="field">
       <label for="d-owner-notes">My notes (only you can see these)</label>
@@ -83,6 +91,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
       number_of_people: number;
       interested_features: string[] | null;
       notes: string | null;
+      converted_company_id: string | null;
       logo_status: string | null;
       brand_colours: string | null;
       status: string;
@@ -114,11 +123,24 @@ import AppLayout from '../../layouts/AppLayout.astro';
       el.className = `msg ${kind}`.trim();
     }
 
-    for (const s of LEAD_STATUSES) {
-      const opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = STATUS_LABELS[s];
-      statusEl.append(opt);
+    const LEAD_COLUMNS =
+      'id, name, company_name, work_email, number_of_people, interested_features, notes, logo_status, brand_colours, status, owner_notes, contacted_at, converted_company_id, created_at';
+    const convertBox = $('convert-box');
+    const convertName = $<HTMLInputElement>('c-name');
+    const convertGo = $<HTMLButtonElement>('c-go');
+    const clientLink = $('client-link');
+    const statusHint = $('status-hint');
+
+    // "Became a client" can only be reached through the Convert button, so the status and the company never disagree.
+    function fillStatusOptions(lead: Lead) {
+      statusEl.replaceChildren();
+      for (const s of LEAD_STATUSES) {
+        if (s === 'converted' && lead.status !== 'converted' && !lead.converted_company_id) continue;
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = STATUS_LABELS[s];
+        statusEl.append(opt);
+      }
     }
 
     function cell(text: string): HTMLTableCellElement {
@@ -180,7 +202,18 @@ import AppLayout from '../../layouts/AppLayout.astro';
       $('d-colours').textContent = lead.brand_colours || 'Not given';
       $('d-notes').textContent = lead.notes || 'None';
       $('d-contacted').textContent = when(lead.contacted_at);
+      fillStatusOptions(lead);
       statusEl.value = isLeadStatus(lead.status) ? lead.status : 'new';
+      const isClient = Boolean(lead.converted_company_id);
+      statusEl.disabled = isClient;
+      statusHint.hidden = !isClient;
+      convertBox.hidden = isClient;
+      clientLink.hidden = !isClient;
+      if (isClient) {
+        ($('client-anchor') as HTMLAnchorElement).href = `/admin/companies?id=${encodeURIComponent(lead.converted_company_id as string)}`;
+      } else {
+        convertName.value = lead.company_name;
+      }
       notesEl.value = lead.owner_notes ?? '';
       say(dMsg, '');
       detailEl.hidden = false;
@@ -210,6 +243,36 @@ import AppLayout from '../../layouts/AppLayout.astro';
       renderRows();
     });
 
+    const CONVERT_ERRORS: Record<string, string> = {
+      '42501': "That isn't allowed. Sign out and sign in again.",
+      '23505': 'This request was already turned into a client. Refresh the page.',
+      '22023': 'Enter a company name (1 to 160 characters).',
+      P0002: 'That request no longer exists. Refresh the page.',
+      PGRST202: "This step isn't switched on in the database yet. Ask for the database update.",
+    };
+
+    convertGo.addEventListener('click', async () => {
+      const lead = leads.find((l) => l.id === selectedId);
+      if (!lead) return;
+      const name = convertName.value.trim();
+      if (!name) {
+        say(dMsg, 'Enter a company name first.', 'error');
+        return;
+      }
+      convertGo.disabled = true;
+      say(dMsg, 'Creating the client…');
+      const { error } = await client.rpc('convert_lead_to_company', { p_lead_id: lead.id, p_name: name });
+      convertGo.disabled = false;
+      if (error) {
+        say(dMsg, CONVERT_ERRORS[error.code ?? ''] ?? "That didn't work. Check your internet and try again.", 'error');
+        return;
+      }
+      const { data } = await client.from('leads').select(LEAD_COLUMNS).eq('id', lead.id).single();
+      if (data) Object.assign(lead, data);
+      select(lead.id);
+      say(dMsg, 'Client created.', 'ok');
+    });
+
     filterEl.addEventListener('change', renderRows);
 
     requireOwner().then(async (supabase) => {
@@ -217,7 +280,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
       client = supabase;
       const { data, error } = await client
         .from('leads')
-        .select('id, name, company_name, work_email, number_of_people, interested_features, notes, logo_status, brand_colours, status, owner_notes, contacted_at, created_at')
+        .select(LEAD_COLUMNS)
         .order('created_at', { ascending: false });
       if (error || !data) {
         say(msg, "That didn't load. Check your internet and refresh.", 'error');

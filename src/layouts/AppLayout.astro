@@ -10,7 +10,7 @@ import '../styles/app.css';
 // Do not use <section> inside app pages (global.css adds big padding to it).
 interface Props {
   title: string;
-  active?: 'overview' | 'leads';
+  active?: 'overview' | 'leads' | 'companies';
   bare?: boolean; // true = centred card with no sidebar (sign-in page)
 }
 
@@ -41,6 +41,7 @@ const { title, active, bare = false } = Astro.props;
             <nav class="app-nav" aria-label="Owner console">
               <a href="/admin" aria-current={active === 'overview' ? 'page' : undefined}>Overview</a>
               <a href="/admin/leads" aria-current={active === 'leads' ? 'page' : undefined}>Demo requests</a>
+              <a href="/admin/companies" aria-current={active === 'companies' ? 'page' : undefined}>Clients</a>
             </nav>
             <button type="button" class="btn-quiet app-signout" id="signout">Sign out</button>
           </aside>
